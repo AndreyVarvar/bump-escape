@@ -1,8 +1,9 @@
 import settings as stt
 import pygame as pg
-from math import radians as rad, sin, cos
-from game_math import clamp
+from math import radians as rad, sin, cos, sqrt, degrees as deg
 import pymunk as pm
+from shape import Rectangle
+import game_math as gm
 
 
 class Player:
@@ -14,67 +15,80 @@ class Player:
 
         self.movement = {"forward": False, "backward": False, "left-turn": False, "right-turn": False}
 
-        self.current_image = self.get_image()
-
-        self.speed = pg.Vector2()
+        self.speed = 0
         self.acceleration = 5
-        self.max_speed = 100
 
         # PHYSICS YEAAH BABYYY
-        self.rect = pm.Body()
-        self.rect.position = self.pos.x, -self.pos.y  # because y-axis is inverted in pygame and not in pymunk space
+        image_size = self.image.get_size()
+        player_physcis_rect = pg.FRect((self.pos.x - image_size[0]/2, self.pos.y - image_size[1]/2), image_size)
+        self.rect = Rectangle(player_physcis_rect)
 
-        self.poly = pm.Poly.create_box(self.rect)
-        self.poly.mass = 100
+        self.rotation_speed = 0.01  # radians
 
-        stt.space.add(self.rect, self.poly)
-
-        self.rotation_speed = 1
+        self.current_image = self.get_image()
 
     def update(self, *args):
         dt = args[0]
+        bounds = args[1]
 
         # update the image
         self.current_image = self.get_image()
 
         # change position based on movement
-        if self.movement["forward"] is True:
-            self.speed.x += cos(rad(self.rotation)) * self.acceleration * dt
-            self.speed.y -= sin(rad(self.rotation)) * self.acceleration * dt
+        if self.rect.body.velocity.length > 0:
+            velocity_vector = pg.Vector2(self.rect.body.velocity)
+            looking = pg.Vector2(cos(rad(self.rotation)), -sin(rad(self.rotation)))
+            self.rect.body.velocity = pm.Vec2d(*list(pg.Vector2.lerp(velocity_vector.normalize(), looking, 0.01) * self.rect.body.velocity.length))
 
-        if self.movement["backward"] is True:
-            self.speed.x -= cos(rad(self.rotation)) * self.acceleration * dt
-            self.speed.y += sin(rad(self.rotation)) * self.acceleration * dt
+        if self.movement["forward"]:
+            pulling_force = (10**5 * cos(rad(self.rotation)),
+                             10**5 * -sin(rad(self.rotation)))  # don't ask why this exact number
 
-        if (self.movement["forward"] is True and self.movement["backward"] is True) or (self.movement["forward"] is False and self.movement["backward"] is False):
-            self.speed.x /= 1.1
-            self.speed.y /= 1.1
+            self.rect.body.apply_force_at_local_point(pulling_force)
 
-        self.speed.clamp_magnitude_ip(self.max_speed) if self.speed.magnitude() > 0 else "uhh"
+        if self.movement["backward"]:
+            self.speed += self.acceleration * dt
 
-        self.pos.x += self.speed.x
-        self.pos.y += self.speed.y
+            pulling_force = (10**5 * -cos(rad(self.rotation)),
+                             10**5 * sin(rad(self.rotation)))  # don't ask why this exact number
+
+            self.rect.body.apply_force_at_local_point(pulling_force)
 
         # rotate or SPIN
         if self.movement["left-turn"] is True:
-            self.rotation += self.speed.magnitude() * self.rotation_speed
+            self.rect.body.angle -= self.rect.body.velocity.length * self.rotation_speed * 0.01
 
         if self.movement["right-turn"] is True:
-            self.rotation -= self.speed.magnitude() * self.rotation_speed
-
+            self.rect.body.angle += self.rect.body.velocity.length * self.rotation_speed * 0.01
 
         if self.rotation < 0:
             self.rotation += 360
         elif self.rotation >= 360:
             self.rotation -= 360
 
+        # make sure player doesn't get out of bounds
+        if self.rect.body.position.x < bounds.left:
+            self.rect.body.position = pm.Vec2d(bounds.left, self.rect.body.position.y)
+            self.rect.body.velocity = (0, self.rect.body.velocity.y)
+        elif self.rect.body.position.x > bounds.right:
+            self.rect.body.position = pm.Vec2d(bounds.right, self.rect.body.position.y)
+            self.rect.body.velocity = (0, self.rect.body.velocity.y)
+
+        if self.rect.body.position.y < bounds.top:
+            self.rect.body.position = pm.Vec2d(self.rect.body.position.y, bounds.top)
+            self.rect.body.velocity = (self.rect.body.velocity.x, 0)
+        elif self.rect.body.position.y > bounds.bottom:
+            self.rect.body.position = pm.Vec2d(self.rect.body.position.y, bounds.bottom)
+            self.rect.body.velocity = (self.rect.body.velocity.x, 0)
+
     def draw(self, *args):
         dt = args[0]
         surf = args[1]
 
-        image_rect = self.current_image.get_rect(center=self.pos)
+        image_rect = self.current_image.get_rect(center=self.rect.body.position)
 
         surf.blit(self.current_image, image_rect)
+
 
     def handle_events(self, *args):
         events = args[0]
@@ -86,6 +100,6 @@ class Player:
         self.movement["right-turn"] = keys_pressed[pg.K_d] or keys_pressed[pg.K_RIGHT]
 
     def get_image(self):
-        image = pg.transform.rotate(self.image, self.rotation-90)
+        image = pg.transform.rotate(self.image, -deg(self.rect.body.angle))
 
         return image

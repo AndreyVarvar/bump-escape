@@ -13,3 +13,5 @@ FPS = 60
 # pymunk stuff
 space = pm.Space()
 space.gravity = 0, 0  # top down, no gravity
+
+cell_size = D_W/7

@@ -1,5 +1,6 @@
 import pygame as pg
 import pymunk as pm
+from debugger import Debugger
 
 # pygame stuff
 pg.init()
@@ -14,4 +15,8 @@ FPS = 60
 space = pm.Space()
 space.gravity = 0, 0  # top down, no gravity
 
-cell_size = D_W/7
+cell_size = D_W/10
+
+debugger = Debugger()
+
+debugger.update("cell_size", str(cell_size))

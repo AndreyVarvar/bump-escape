@@ -4,6 +4,8 @@ import pygame as pg
 import game_math as gm
 
 
+# this code was stolen from official example online (stealing is the key to success)
+
 class Box:
     def __init__(self, rect: pg.FRect, d=2):
         vertices = gm.get_rect_points_as_polygon(rect)

@@ -22,3 +22,7 @@ def get_rect_points_as_polygon(rect: pg.FRect | pg.Rect):
     vertices = [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]
 
     return vertices
+
+
+def xor(a, b):
+    return not (a and b) and (a or b)

@@ -5,6 +5,7 @@ from player import Player
 import pymunk as pm
 import pymunk.pygame_util as pg_util
 from camera import Camera
+from game_map import Map
 
 
 class Game:
@@ -19,9 +20,14 @@ class Game:
 
         self.draw_options = pg_util.DrawOptions(self.display)
 
+        # map
+        self.map = Map()
+
         # main characters (not durk)
-        self.player = Player((100, 100))
-        self.camera = Camera((100, 100))
+        self.player = Player(self.map.checkpoints.current_checkpoint.center)
+        self.camera = Camera(self.player.rect.body.position)
+
+        self.bounds = self.map.boundaries
 
     def run(self):
         while self.running:
@@ -40,21 +46,24 @@ class Game:
             self.draw(dt)
 
     def update(self, dt):
-        self.player.update(dt, pg.Rect(0, stt.D_W, 0, stt.D_H))
+        self.player.update(dt, self.bounds)
         stt.space.step(1/self.FPS)
 
-        self.camera.follow(self.player.rect.body.position, pg.Rect(0, stt.D_W, 0, stt.D_H))
+        self.camera.follow(self.player.rect.body.position, self.bounds)
+
+        stt.debugger.update("fps", str(round(1/dt)))
 
     def draw(self, dt):
         self.display.fill("white")
         self.camera.clear()
 
-        road = pg.transform.scale_by(pg.image.load("assets/images/road.png"), 4)
+        self.map.draw(self.camera)
 
-        self.camera.blit(road, (0, 0))
         self.player.draw(dt, self.camera)
 
         self.camera.draw(self.display)
+
+        stt.debugger.draw(self.display)
 
         pg.display.update()
 

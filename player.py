@@ -2,6 +2,7 @@ import settings as stt
 import pygame as pg
 from math import radians as rad, sin, cos
 from game_math import clamp
+import pymunk as pm
 
 
 class Player:
@@ -18,6 +19,15 @@ class Player:
         self.speed = pg.Vector2()
         self.acceleration = 5
         self.max_speed = 100
+
+        # PHYSICS YEAAH BABYYY
+        self.rect = pm.Body()
+        self.rect.position = self.pos.x, -self.pos.y  # because y-axis is inverted in pygame and not in pymunk space
+
+        self.poly = pm.Poly.create_box(self.rect)
+        self.poly.mass = 100
+
+        stt.space.add(self.rect, self.poly)
 
         self.rotation_speed = 1
 

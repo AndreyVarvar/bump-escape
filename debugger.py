@@ -5,6 +5,7 @@ class Debugger:
     def __init__(self):
         self.text = dict()
         self.font = pg.font.SysFont("haha no", 30)
+        print("ignore the warning above ^^^^")
 
     def update(self, description: str, text: str):
         self.text[description] = text

@@ -29,30 +29,19 @@ class Player:
 
     def update(self, *args):
         dt = args[0]
-        bounds = args[1]
 
         # update the image
         self.current_image = self.get_image()
 
         # change position based on movement
         velocity_vector = pg.Vector2(self.rect.body.velocity)
-        looking = pg.Vector2(cos(rad(self.rotation)), -sin(rad(self.rotation)))
-        if self.rect.body.velocity.length > 0:
-            self.rect.body.velocity = pm.Vec2d(*list(pg.Vector2.lerp(velocity_vector.normalize(), looking, 0.01) * self.rect.body.velocity.length))
+        looking = pg.Vector2(sin(self.rect.body.angle), cos(self.rect.body.angle))
 
         if self.movement["forward"]:
-            pulling_force = (10**5 * cos(rad(self.rotation)),
-                             10**5 * -sin(rad(self.rotation)))  # don't ask why this exact number
-
-            self.rect.body.apply_force_at_local_point(pulling_force)
+            self.rect.body.apply_force_at_local_point((0, -10**5))
 
         if self.movement["backward"]:
-            self.speed += self.acceleration * dt
-
-            pulling_force = (10**5 * -cos(rad(self.rotation)),
-                             10**5 * sin(rad(self.rotation)))  # don't ask why this exact number
-
-            self.rect.body.apply_force_at_local_point(pulling_force)
+            self.rect.body.apply_force_at_local_point((0, 10**5))
 
         # rotate or SPIN
         if gm.xor(self.movement["right-turn"], self.movement["left-turn"]):
@@ -65,35 +54,17 @@ class Player:
 
         self.rect.body.angular_velocity /= 1.01
 
-        if self.rotation < 0:
-            self.rotation += 360
-        elif self.rotation >= 360:
-            self.rotation -= 360
+        if self.rect.body.angle < 0:
+            self.rect.body.angle += 2*pi
+        elif self.rect.body.angle >= 2*pi:
+            self.rect.body.angle -= 2*pi
 
-        # make sure player doesn't get out of bounds
-        boundaries = {"top": False, "bottom": False, "left": False, "right": False}
-
-        if self.rect.body.position.x < bounds.left:
-            self.rect.body.position = pm.Vec2d(bounds.left, self.rect.body.position.y)
-            self.rect.body.velocity = (0, self.rect.body.velocity.y)
-            boundaries["left"] = True
-        elif self.rect.body.position.x > bounds.right:
-            self.rect.body.position = pm.Vec2d(bounds.right, self.rect.body.position.y)
-            self.rect.body.velocity = (0, self.rect.body.velocity.y)
-            boundaries["right"] = True
-
-        if self.rect.body.position.y < bounds.top:
-            self.rect.body.position = pm.Vec2d(self.rect.body.position.x, bounds.top)
-            self.rect.body.velocity = (self.rect.body.velocity.x, 0)
-            boundaries["top"] = True
-        elif self.rect.body.position.y > bounds.bottom:
-            self.rect.body.position = pm.Vec2d(self.rect.body.position.x, bounds.bottom)
-            self.rect.body.velocity = (self.rect.body.velocity.x, 0)
-            boundaries["bottom"] = True
 
         stt.debugger.update("player_pos", str(self.rect.body.position))
-        stt.debugger.update("player_uhh", str(boundaries))
         stt.debugger.update("player_angle", str(self.rect.body.angle))
+        # stt.debugger.update("player_velocity", str((round(self.rect.body.velocity[0], 2), round(self.rect.body.velocity[1], 2))))
+        # stt.debugger.update("angle_vector", str(self.rect.body.rotation_vector))
+        # stt.debugger.update("looking", str(looking))
 
     def draw(self, *args):
         dt = args[0]

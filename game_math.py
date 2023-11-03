@@ -1,5 +1,6 @@
 import settings as stt
 import pygame as pg
+from math import acos, sqrt, dist
 
 
 def clamp(n, min_n, max_n):
@@ -17,7 +18,7 @@ def convert_pos(pos):
 
 def get_rect_points_as_polygon(rect: pg.FRect | pg.Rect):
     x0, y0 = convert_pos(rect.topleft)
-    x1, y1 = convert_pos(rect.bottomright)
+    x1, y1 = rect.bottomright
 
     vertices = [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]
 
@@ -26,3 +27,7 @@ def get_rect_points_as_polygon(rect: pg.FRect | pg.Rect):
 
 def xor(a, b):
     return not (a and b) and (a or b)
+
+
+def find_angle_between_points(p1, p2, p3):
+    return acos((dist(p2, p1)**2 + dist(p2, p3)**2 - dist(p1, p3)**2) / (2 * dist(p1, p2) * dist(p2, p3)))

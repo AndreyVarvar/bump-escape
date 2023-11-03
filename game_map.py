@@ -2,6 +2,7 @@ import settings as stt
 import pygame as pg
 from shape import Circle
 import pymunk as pm
+from shape import Box
 
 
 class Checkpoints:
@@ -28,7 +29,7 @@ class Map:
 
         EVERYTHING_WE_NEED_TO_KNOW_ABOUT_THIS_MAP = self.load_map()
 
-        self.map, self.objects, self.checkpoints, self.boundaries = EVERYTHING_WE_NEED_TO_KNOW_ABOUT_THIS_MAP
+        self.map, self.objects, self.checkpoints, self.boundaries, self.array = EVERYTHING_WE_NEED_TO_KNOW_ABOUT_THIS_MAP
 
     def draw(self, camera):
         camera.blit(self.map, (0, 0))
@@ -40,23 +41,36 @@ class Map:
         map_map = pg.Surface((map_layout_image_size[0] * stt.cell_size, map_layout_image_size[1] * stt.cell_size), pg.SRCALPHA)
         objects = []
         checkpoints = Checkpoints()
-        boundaries = map_map.get_rect()
+        map_array = []
+
+        bounds_rect = pg.FRect(0, 0, stt.D_W,map_layout_image_size[1] * stt.cell_size - 20)
+
+        bounds = Box(bounds_rect)
 
         for i in range(int(map_map.get_height()/self.road_image.get_height())):
             map_map.blit(self.road_image, (0, i*self.road_image.get_height()))
 
         for x in range(map_layout_image_size[0]):
+            map_array_row = []
+
             for y in range(map_layout_image_size[1]):
                 pixel = map_layout_image.get_at((x, y))
 
                 if pixel == (16, 18, 28):
                     map_map.blit(self.tyre_image, (stt.cell_size*x, stt.cell_size*y))
                     objects.append(Circle((stt.cell_size*(x+0.5), stt.cell_size*(y+0.5)), stt.cell_size/2, pm.Body.STATIC))
+                    map_array_row.append(0)
 
                 elif pixel == (255, 255, 255):
                     map_map.blit(self.checkpoint_image, (stt.cell_size * x, stt.cell_size * y))
                     checkpoints.add_checkpoint(pg.Rect(x*stt.cell_size, y*stt.cell_size, stt.cell_size, stt.cell_size))
+                    map_array_row.append(1)
+
+                else:
+                    map_array_row.append(1)
+
+            map_array.append(map_array_row)
 
         checkpoints.current_checkpoint = pg.Rect(stt.D_W//2 - stt.cell_size//2, map_layout_image_size[1]*stt.cell_size-stt.D_H//2, stt.cell_size, stt.cell_size)
 
-        return map_map, objects, checkpoints, boundaries
+        return map_map, objects, checkpoints, bounds, map_array

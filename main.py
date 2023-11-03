@@ -6,6 +6,7 @@ import pymunk as pm
 import pymunk.pygame_util as pg_util
 from camera import Camera
 from game_map import Map
+from chaser import Chaser
 
 
 class Game:
@@ -26,13 +27,16 @@ class Game:
         # main characters (not durk)
         self.player = Player(self.map.checkpoints.current_checkpoint.center)
         self.camera = Camera(self.player.rect.body.position)
+        self.chaser = Chaser((self.player.rect.body.position.x,
+                              self.player.rect.body.position.y + 200),
+                             self.map.array)
 
         self.bounds = self.map.boundaries
 
     def run(self):
         while self.running:
             # update some variables
-            dt = self.clock.tick(self.FPS) / 1000
+            dt = self.clock.tick(self.FPS)/1000
 
             keys_pressed = pg.key.get_pressed()
             mouse_pressed = pg.mouse.get_pressed()
@@ -46,10 +50,11 @@ class Game:
             self.draw(dt)
 
     def update(self, dt):
-        self.player.update(dt, self.bounds)
+        self.player.update(dt)
+        self.chaser.update(dt, self.player.rect.body.position)
         stt.space.step(1/self.FPS)
 
-        self.camera.follow(self.player.rect.body.position, self.bounds)
+        self.camera.follow(self.player.rect.body.position)
 
         stt.debugger.update("fps", str(round(1/dt)))
 
@@ -59,7 +64,14 @@ class Game:
 
         self.map.draw(self.camera)
 
+        temp = pg.Surface((stt.cell_size, stt.cell_size), pg.SRCALPHA)
+        temp.fill((0, 255, 127))
+        for cell in self.chaser.path:
+            cell = list(cell)
+            self.camera.blit(temp, (cell[1]*stt.cell_size, cell[0]*stt.cell_size))
+
         self.player.draw(dt, self.camera)
+        self.chaser.draw(dt, self.camera)
 
         self.camera.draw(self.display)
 

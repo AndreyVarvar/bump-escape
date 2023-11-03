@@ -12,6 +12,7 @@ class Box:
 
         for i in range(4):
             segment = pm.Segment(stt.space.static_body, vertices[i], vertices[(i+1) % 4], d)
+            segment.collision_type = i+3
             segment.elasticity = 1
             segment.friction = 1
             stt.space.add(segment)
@@ -33,11 +34,11 @@ class Rectangle:
         self.body = pm.Body()
         self.body.position = rect.center
 
-        shape = pm.Poly.create_box(self.body, rect.size)
-        shape.density = 0.1
-        shape.elasticity = 1
-        shape.friction = 1
-        stt.space.add(self.body, shape)
+        self.shape = pm.Poly.create_box(self.body, rect.size)
+        self.shape.density = 0.1
+        self.shape.elasticity = 1
+        self.shape.friction = 1
+        stt.space.add(self.body, self.shape)
 
 
 class Circle:
@@ -45,12 +46,12 @@ class Circle:
         self.body = pm.Body(body_type=body_type)
         self.body.position = pos
 
-        shape = pm.Circle(self.body, radius)
+        self.shape = pm.Circle(self.body, radius)
 
         if body_type != pm.Body.STATIC:
-            shape.density = 0.1
+            self.shape.density = 0.1
 
-        shape.elasticity = 1
-        shape.friction = 1
+        self.shape.elasticity = 1
+        self.shape.friction = 1
 
-        stt.space.add(self.body, shape)
+        stt.space.add(self.body, self.shape)

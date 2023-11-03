@@ -1,4 +1,3 @@
-import game_math as gm
 import settings as stt
 import pygame as pg
 from player import Player
@@ -7,6 +6,7 @@ import pymunk.pygame_util as pg_util
 from camera import Camera
 from game_map import Map
 from chaser import Chaser
+from timer import Timer
 
 
 class Game:
@@ -22,14 +22,24 @@ class Game:
         self.draw_options = pg_util.DrawOptions(self.display)
 
         # map
-        self.map = Map()
+        self.map = Map(1)
+
+        # timer
+        self.timer = Timer()
 
         # main characters (not durk)
-        self.player = Player(self.map.checkpoints.current_checkpoint.center)
+        obstacles_collision_type = 7
+        player_collision_type = 1
+        chaser_collision_type = 2
+
+        self.player = Player(self.map.checkpoints.current_checkpoint.center, player_collision_type)
         self.camera = Camera(self.player.rect.body.position)
         self.chaser = Chaser((self.player.rect.body.position.x,
                               self.player.rect.body.position.y + 200),
-                             self.map.array)
+                             self.map.array, chaser_collision_type)
+
+        self.player_collision_handlers = [stt.space.add_collision_handler(player_collision_type, obstacles_collision_type + i) for i in range(len(self.map.objects)+4)]
+        self.chaser_collision_handlers = [stt.space.add_collision_handler(chaser_collision_type, obstacles_collision_type + i) for i in range(len(self.map.objects)+4)]
 
         self.bounds = self.map.boundaries
 
@@ -56,6 +66,14 @@ class Game:
 
         self.camera.follow(self.player.rect.body.position)
 
+        self.timer.update(dt)
+
+        for handler in self.player_collision_handlers:
+            handler.begin = self.player.play_sound
+
+        for handler in self.chaser_collision_handlers:
+            handler.begin = self.chaser.play_sound
+
         stt.debugger.update("fps", str(round(1/dt)))
 
     def draw(self, dt):
@@ -64,18 +82,20 @@ class Game:
 
         self.map.draw(self.camera)
 
-        temp = pg.Surface((stt.cell_size, stt.cell_size), pg.SRCALPHA)
-        temp.fill((0, 255, 127))
-        for cell in self.chaser.path:
-            cell = list(cell)
-            self.camera.blit(temp, (cell[1]*stt.cell_size, cell[0]*stt.cell_size))
+        # temp = pg.Surface((stt.cell_size, stt.cell_size), pg.SRCALPHA)
+        # temp.fill((0, 255, 127))
+        # for cell in self.chaser.path:
+        #     cell = list(cell)
+        #     self.camera.blit(temp, (cell[1]*stt.cell_size, cell[0]*stt.cell_size))
 
         self.player.draw(dt, self.camera)
         self.chaser.draw(dt, self.camera)
 
         self.camera.draw(self.display)
 
-        stt.debugger.draw(self.display)
+        self.timer.draw(self.display)
+
+        # stt.debugger.draw(self.display)
 
         pg.display.update()
 

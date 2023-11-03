@@ -7,7 +7,7 @@ import game_math as gm
 
 
 class Player:
-    def __init__(self, pos):
+    def __init__(self, pos, collision_type):
         self.pos = pg.Vector2(pos)
 
         self.image = pg.transform.scale_by(pg.image.load("assets/images/kart.png"), 3)
@@ -15,13 +15,16 @@ class Player:
 
         self.movement = {"forward": False, "backward": False, "left-turn": False, "right-turn": False}
 
-        self.speed = 0
-        self.acceleration = 5
+        self.prev_velocity = pm.Vec2d(0, 0)
+
+        self.collision_sound = pg.mixer.Sound("assets/sfx/bump.ogg")
 
         # PHYSICS YEAAH BABYYY
         image_size = self.image.get_size()
         player_physcis_rect = pg.FRect((self.pos.x - image_size[0]/2, self.pos.y - image_size[1]/2), image_size)
         self.rect = Rectangle(player_physcis_rect)
+
+        self.rect.shape.collision_type = collision_type
 
         self.rotation_speed = pi  # radians
 
@@ -88,3 +91,7 @@ class Player:
         image = pg.transform.rotate(self.image, -deg(self.rect.body.angle))
 
         return image
+
+    def play_sound(self, arbiter, space, data):
+        self.collision_sound.play()
+        return True

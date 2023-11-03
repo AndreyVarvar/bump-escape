@@ -23,15 +23,28 @@ class Checkpoints:
 
 class Map:
     def __init__(self, collision_type):
-        self.tyre_image = pg.transform.scale(pg.image.load("assets/images/tire.png"), (stt.cell_size, stt.cell_size)).convert_alpha()
-        self.checkpoint_image = pg.transform.scale(pg.image.load("assets/images/checkpoint.png"), (stt.cell_size, stt.cell_size)).convert_alpha()
-        self.road_image = pg.transform.scale_by(pg.image.load("assets/images/road.png"), 4).convert_alpha()
+        self.tyre_image = pg.transform.scale(
+            pg.image.load("assets/images/tire.png"), (stt.cell_size, stt.cell_size)
+        ).convert_alpha()
+        self.checkpoint_image = pg.transform.scale(
+            pg.image.load("assets/images/checkpoint.png"),
+            (stt.cell_size, stt.cell_size),
+        ).convert_alpha()
+        self.road_image = pg.transform.scale_by(
+            pg.image.load("assets/images/road.png"), 4
+        ).convert_alpha()
 
         self.collision_type = collision_type
 
         EVERYTHING_WE_NEED_TO_KNOW_ABOUT_THIS_MAP = self.load_map()
 
-        self.map, self.objects, self.checkpoints, self.boundaries, self.array = EVERYTHING_WE_NEED_TO_KNOW_ABOUT_THIS_MAP
+        (
+            self.map,
+            self.objects,
+            self.checkpoints,
+            self.boundaries,
+            self.array,
+        ) = EVERYTHING_WE_NEED_TO_KNOW_ABOUT_THIS_MAP
 
     def draw(self, camera):
         camera.blit(self.map, (0, 0))
@@ -40,19 +53,27 @@ class Map:
         map_layout_image = pg.image.load("assets/images/map.png")
         map_layout_image_size = map_layout_image.get_size()
 
-        map_map = pg.Surface((map_layout_image_size[0] * stt.cell_size, map_layout_image_size[1] * stt.cell_size), pg.SRCALPHA)
+        map_map = pg.Surface(
+            (
+                map_layout_image_size[0] * stt.cell_size,
+                map_layout_image_size[1] * stt.cell_size,
+            ),
+            pg.SRCALPHA,
+        )
         objects = []
         checkpoints = Checkpoints()
         map_array = []
 
-        bounds_rect = pg.FRect(0, 0, stt.D_W, map_layout_image_size[1] * stt.cell_size - 20)
+        bounds_rect = pg.FRect(
+            0, 0, stt.D_W, map_layout_image_size[1] * stt.cell_size - 20
+        )
 
         bounds = Box(bounds_rect)
 
         object_count = 0
 
-        for i in range(int(map_map.get_height()/self.road_image.get_height())):
-            map_map.blit(self.road_image, (0, i*self.road_image.get_height()))
+        for i in range(int(map_map.get_height() / self.road_image.get_height())):
+            map_map.blit(self.road_image, (0, i * self.road_image.get_height()))
 
         for x in range(map_layout_image_size[0]):
             map_array_row = []
@@ -61,16 +82,31 @@ class Map:
                 pixel = map_layout_image.get_at((x, y))
 
                 if pixel == (16, 18, 28):
-                    map_map.blit(self.tyre_image, (stt.cell_size*x, stt.cell_size*y))
-                    obj = Circle((stt.cell_size*(x+0.5), stt.cell_size*(y+0.5)), stt.cell_size/2, pm.Body.STATIC)
-                    obj.shape.collision_type = self.collision_type+object_count
+                    map_map.blit(
+                        self.tyre_image, (stt.cell_size * x, stt.cell_size * y)
+                    )
+                    obj = Circle(
+                        (stt.cell_size * (x + 0.5), stt.cell_size * (y + 0.5)),
+                        stt.cell_size / 2,
+                        pm.Body.STATIC,
+                    )
+                    obj.shape.collision_type = self.collision_type + object_count
                     object_count += 1
                     objects.append(obj)
                     map_array_row.append(0)
 
                 elif pixel == (255, 255, 255):
-                    map_map.blit(self.checkpoint_image, (stt.cell_size * x, stt.cell_size * y))
-                    checkpoints.add_checkpoint(pg.Rect(x*stt.cell_size, y*stt.cell_size, stt.cell_size, stt.cell_size))
+                    map_map.blit(
+                        self.checkpoint_image, (stt.cell_size * x, stt.cell_size * y)
+                    )
+                    checkpoints.add_checkpoint(
+                        pg.Rect(
+                            x * stt.cell_size,
+                            y * stt.cell_size,
+                            stt.cell_size,
+                            stt.cell_size,
+                        )
+                    )
                     map_array_row.append(1)
 
                 else:
@@ -78,6 +114,11 @@ class Map:
 
             map_array.append(map_array_row)
 
-        checkpoints.current_checkpoint = pg.Rect(stt.D_W//2 - stt.cell_size//2, map_layout_image_size[1]*stt.cell_size-stt.D_H//2, stt.cell_size, stt.cell_size)
+        checkpoints.current_checkpoint = pg.Rect(
+            stt.D_W // 2 - stt.cell_size // 2,
+            map_layout_image_size[1] * stt.cell_size - stt.D_H // 2,
+            stt.cell_size,
+            stt.cell_size,
+        )
 
         return map_map, objects, checkpoints, bounds, map_array

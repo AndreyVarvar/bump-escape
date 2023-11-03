@@ -13,7 +13,12 @@ class Player:
         self.image = pg.transform.scale_by(pg.image.load("assets/images/kart.png"), 2.8)
         self.rotation = 90  # degrees
 
-        self.movement = {"forward": False, "backward": False, "left-turn": False, "right-turn": False}
+        self.movement = {
+            "forward": False,
+            "backward": False,
+            "left-turn": False,
+            "right-turn": False,
+        }
 
         self.prev_velocity = pm.Vec2d(0, 0)
 
@@ -21,7 +26,9 @@ class Player:
 
         # PHYSICS YEAAH BABYYY
         image_size = self.image.get_size()
-        player_physcis_rect = pg.FRect((self.pos.x - image_size[0]/2, self.pos.y - image_size[1]/2), image_size)
+        player_physcis_rect = pg.FRect(
+            (self.pos.x - image_size[0] / 2, self.pos.y - image_size[1] / 2), image_size
+        )
         self.rect = Rectangle(player_physcis_rect)
 
         self.rect.shape.collision_type = collision_type
@@ -41,10 +48,10 @@ class Player:
 
         # change position based on movement
         if self.movement["forward"]:
-            self.rect.body.apply_force_at_local_point((0, -10**5*1.5))
+            self.rect.body.apply_force_at_local_point((0, -(10**5) * 1.5))
 
         if self.movement["backward"]:
-            self.rect.body.apply_force_at_local_point((0, 10**5*1.5))
+            self.rect.body.apply_force_at_local_point((0, 10**5 * 1.5))
 
         # rotate or SPIN
         if gm.xor(self.movement["right-turn"], self.movement["left-turn"]):
@@ -58,10 +65,9 @@ class Player:
         self.rect.body.angular_velocity /= 1.01
 
         if self.rect.body.angle < 0:
-            self.rect.body.angle += 2*pi
-        elif self.rect.body.angle >= 2*pi:
-            self.rect.body.angle -= 2*pi
-
+            self.rect.body.angle += 2 * pi
+        elif self.rect.body.angle >= 2 * pi:
+            self.rect.body.angle -= 2 * pi
 
         stt.debugger.update("player_pos", str(self.rect.body.position))
         stt.debugger.update("player_angle", str(self.rect.body.angle))
@@ -76,7 +82,6 @@ class Player:
         image_rect = self.current_image.get_rect(center=self.rect.body.position)
 
         surf.blit(self.current_image, image_rect)
-
 
     def handle_events(self, *args):
         events = args[0]
@@ -93,6 +98,9 @@ class Player:
         return image
 
     def play_sound(self, arbiter, space, data):
-        self.collision_sound.set_volume((1 - (1/((self.rect.body.kinetic_energy/(5*10**7))+1)))*self.sfx_volume)
+        self.collision_sound.set_volume(
+            (1 - (1 / ((self.rect.body.kinetic_energy / (5 * 10**7)) + 1)))
+            * self.sfx_volume
+        )
         self.collision_sound.play()
         return True

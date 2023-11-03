@@ -14,11 +14,14 @@ class Chaser:
 
         self.finder = DijkstraFinder()
 
-        self.radius = stt.cell_size//2 - 5
+        self.radius = stt.cell_size // 2 - 5
 
         self.difficulty = difficulty
 
-        self.image = pg.transform.scale(pg.image.load("assets/images/roomba.png"), (self.radius*2, self.radius*2)).convert_alpha()
+        self.image = pg.transform.scale(
+            pg.image.load("assets/images/roomba.png"),
+            (self.radius * 2, self.radius * 2),
+        ).convert_alpha()
 
         self.body = pm.Body(body_type=pm.Body.DYNAMIC)
         self.body.position = pos
@@ -33,7 +36,6 @@ class Chaser:
 
         self.collision_sound = pg.mixer.Sound("assets/sfx/bump.ogg")
 
-
         self.prev_player_pos = (0, 0)
         self.prev_chase_pos = (1, 1)
 
@@ -44,12 +46,19 @@ class Chaser:
         self.sfx_volume = 1
 
     def find_path(self, player_pos):
-        player_pos_in_matrix = (int(player_pos[1] // stt.cell_size),
-                                int(player_pos[0] // stt.cell_size))
-        chaser_pos_in_matrix = (int(self.circ.body.position.y // stt.cell_size),
-                                int(self.circ.body.position.x // stt.cell_size))
+        player_pos_in_matrix = (
+            int(player_pos[1] // stt.cell_size),
+            int(player_pos[0] // stt.cell_size),
+        )
+        chaser_pos_in_matrix = (
+            int(self.circ.body.position.y // stt.cell_size),
+            int(self.circ.body.position.x // stt.cell_size),
+        )
 
-        if self.prev_chase_pos != chaser_pos_in_matrix or self.prev_player_pos != player_pos_in_matrix:
+        if (
+            self.prev_chase_pos != chaser_pos_in_matrix
+            or self.prev_player_pos != player_pos_in_matrix
+        ):
             self.grid.cleanup()
 
             self.prev_chase_pos = chaser_pos_in_matrix
@@ -73,19 +82,29 @@ class Chaser:
         self.sfx_volume = sfx_volume
 
         next_cell_pos = list(self.path[1 if len(self.path) >= 2 else 0])
-        next_cell = pg.Rect(next_cell_pos[1] * stt.cell_size, next_cell_pos[0] * stt.cell_size, stt.cell_size, stt.cell_size)
+        next_cell = pg.Rect(
+            next_cell_pos[1] * stt.cell_size,
+            next_cell_pos[0] * stt.cell_size,
+            stt.cell_size,
+            stt.cell_size,
+        )
 
-        looking = pm.Vec2d(-sin(self.circ.body.angle), cos(self.circ.body.angle))  # the trigonometric functions are swapped, because instead of calculating angle from positive x-axis, pymunk calculates it from positive y-axis
-        target = pm.Vec2d(self.circ.body.position.x - next_cell.centerx, self.circ.body.position.y - next_cell.centery)
+        looking = pm.Vec2d(
+            -sin(self.circ.body.angle), cos(self.circ.body.angle)
+        )  # the trigonometric functions are swapped, because instead of calculating angle from positive x-axis, pymunk calculates it from positive y-axis
+        target = pm.Vec2d(
+            self.circ.body.position.x - next_cell.centerx,
+            self.circ.body.position.y - next_cell.centery,
+        )
 
         # for some reason angle on vectors is calculated from negative x-axis... WHAT IS GOING ON
         looking_ang = looking.angle + pi
         target_ang = target.angle + pi
 
         if self.circ.body.angle < 0:
-            self.circ.body.angle += 2*pi
-        elif self.circ.body.angle >= 2*pi:
-            self.circ.body.angle -= 2*pi
+            self.circ.body.angle += 2 * pi
+        elif self.circ.body.angle >= 2 * pi:
+            self.circ.body.angle -= 2 * pi
 
         # rotate towards target location
         power = 10
@@ -97,10 +116,12 @@ class Chaser:
         else:
             self.circ.body.angular_velocity = -power
 
-        if abs(looking_ang - target_ang) < pi/8:
-            self.circ.body.apply_force_at_local_point((0, -self.difficulty*10**5))
+        if abs(looking_ang - target_ang) < pi / 8:
+            self.circ.body.apply_force_at_local_point((0, -self.difficulty * 10**5))
         else:
-            self.circ.body.velocity = pm.Vec2d(self.circ.body.velocity.x//1.2, self.circ.body.velocity.y//1.2)
+            self.circ.body.velocity = pm.Vec2d(
+                self.circ.body.velocity.x // 1.2, self.circ.body.velocity.y // 1.2
+            )
 
         # debugging
         # stt.debugger.update("next_cell", str(next_cell))
@@ -128,7 +149,10 @@ class Chaser:
                 cell_prev = prev_cells[1]
                 cell_prev_prev = prev_cells[0]
 
-                if cell[0] == cell_prev[0] == cell_prev_prev[0] or cell[1] == cell_prev[1] == cell_prev_prev[1]:
+                if (
+                    cell[0] == cell_prev[0] == cell_prev_prev[0]
+                    or cell[1] == cell_prev[1] == cell_prev_prev[1]
+                ):
                     prev_cells.pop(0)
                     prev_cells.append(list(node))
                 else:
@@ -143,11 +167,14 @@ class Chaser:
             return path
 
     def play_sound(self, arbiter, space, data):
-        player_pos = self.prev_player_pos[0]*stt.cell_size, self.prev_player_pos[1]*stt.cell_size
-        volume = -dist(player_pos, self.circ.body.position)/(5*stt.cell_size) + 1
+        player_pos = (
+            self.prev_player_pos[0] * stt.cell_size,
+            self.prev_player_pos[1] * stt.cell_size,
+        )
+        volume = -dist(player_pos, self.circ.body.position) / (5 * stt.cell_size) + 1
 
         if volume < 0:
             volume = 0
-        self.collision_sound.set_volume(volume*self.sfx_volume)
+        self.collision_sound.set_volume(volume * self.sfx_volume)
         self.collision_sound.play()
         return True

@@ -6,13 +6,16 @@ import game_math as gm
 
 # this code was stolen from official example online (stealing is the key to success)
 
+
 class Box:
     def __init__(self, rect: pg.FRect, d=2):
         vertices = gm.get_rect_points_as_polygon(rect)
 
         for i in range(4):
-            segment = pm.Segment(stt.space.static_body, vertices[i], vertices[(i+1) % 4], d)
-            segment.collision_type = i+3
+            segment = pm.Segment(
+                stt.space.static_body, vertices[i], vertices[(i + 1) % 4], d
+            )
+            segment.collision_type = i + 3
             segment.elasticity = 1
             segment.friction = 1
             stt.space.add(segment)

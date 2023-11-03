@@ -12,5 +12,7 @@ class Debugger:
 
     def draw(self, surf):
         for i, description in enumerate(self.text.keys()):
-            text_surf = self.font.render(description + ": " + self.text[description], True, (127, 0, 0))
-            surf.blit(text_surf, (10, 10 + i*40))
+            text_surf = self.font.render(
+                description + ": " + self.text[description], True, (127, 0, 0)
+            )
+            surf.blit(text_surf, (10, 10 + i * 40))

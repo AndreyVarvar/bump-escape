@@ -16,7 +16,7 @@ FPS = 60
 space = pm.Space()
 space.gravity = 0, 0  # top down, no gravity
 
-cell_size = D_W/10
+cell_size = D_W / 10
 
 channel_music = pg.mixer.Channel(0)
 

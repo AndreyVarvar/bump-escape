@@ -1,6 +1,12 @@
 import settings as stt
 import pygame as pg
-from scenes import GameScene, SettingsScene, MainMenuScene, DifficultySelectScene, WinScene
+from scenes import (
+    GameScene,
+    SettingsScene,
+    MainMenuScene,
+    DifficultySelectScene,
+    WinScene,
+)
 from font import Font
 from consts import colors
 
@@ -15,13 +21,20 @@ class Game:
 
         self.running = True
 
-        self.font = Font("assets/fonts/da_font.png", colors["letter-end"], colors["offset-indicator"], 1)
+        self.font = Font(
+            "assets/fonts/da_font.png",
+            colors["letter-end"],
+            colors["offset-indicator"],
+            1,
+        )
 
-        self.scenes = {"main menu": MainMenuScene(self.display, self.font),
-                       "settings": SettingsScene(self.display, self.font),
-                       "difficulty selection": DifficultySelectScene(self.display, self.font),
-                       "game": GameScene(self.display),
-                       "win screen": WinScene(self.display, self.font)}
+        self.scenes = {
+            "main menu": MainMenuScene(self.display, self.font),
+            "settings": SettingsScene(self.display, self.font),
+            "difficulty selection": DifficultySelectScene(self.display, self.font),
+            "game": GameScene(self.display),
+            "win screen": WinScene(self.display, self.font),
+        }
 
         self.sfx_volume = 1
 
@@ -78,7 +91,6 @@ class Game:
             if not stt.channel_music.get_busy():
                 stt.channel_music.play(self.music_HARDMODE_YEAAAH, -1)
 
-
         if self.current_scene.name == "settings":
             self.sfx_volume = self.current_scene.sfx_volume
             for scene in self.scenes.values():
@@ -95,7 +107,9 @@ class Game:
             self.scenes["game"].difficulty = self.current_scene.selected_difficulty
 
         if self.current_scene.change_scene:
-            self.scenes["win screen"].update_label(self.scenes["game"].timer.get_image())
+            self.scenes["win screen"].update_label(
+                self.scenes["game"].timer.get_image()
+            )
             prev_scene = self.current_scene
             self.current_scene = self.scenes[self.current_scene.new_scene]
             prev_scene.reset()
@@ -116,7 +130,9 @@ class Game:
             if event.type == pg.QUIT:
                 self.running = False
 
-        self.current_scene.handle_events(dt, events, keys_pressed, mouse_pressed, mouse_pos)
+        self.current_scene.handle_events(
+            dt, events, keys_pressed, mouse_pressed, mouse_pos
+        )
 
 
 i_am_tired_of_writing_long_name_on_these_variables_for_fun = Game()

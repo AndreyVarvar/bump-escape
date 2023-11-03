@@ -39,31 +39,35 @@ class MainMenuScene(BaseScene):
         self.display = display
         self.font = font
 
-        self.button_play = Button(pg.Rect(120, 275, 400, 100),
-                                  colors["green"],
-                                  colors["dark-green"],
-                                  colors["light-green"],
-                                  colors["green"],
-                                  "Play",
-                                  True,
-                                  5,
-                                  self.font,
-                                  "assets/sfx/bump.ogg",
-                                  self.sfx_volume,
-                                  5)
+        self.button_play = Button(
+            pg.Rect(120, 275, 400, 100),
+            colors["green"],
+            colors["dark-green"],
+            colors["light-green"],
+            colors["green"],
+            "Play",
+            True,
+            5,
+            self.font,
+            "assets/sfx/bump.ogg",
+            self.sfx_volume,
+            5,
+        )
 
-        self.button_settings = Button(pg.Rect(120, 400, 400, 100),
-                                      colors["tangerine"],
-                                      colors["brown"],
-                                      colors["orange"],
-                                      colors["tangerine"],
-                                      "Settings",
-                                      True,
-                                      5,
-                                      self.font,
-                                      "assets/sfx/bump.ogg",
-                                      self.sfx_volume,
-                                      5)
+        self.button_settings = Button(
+            pg.Rect(120, 400, 400, 100),
+            colors["tangerine"],
+            colors["brown"],
+            colors["orange"],
+            colors["tangerine"],
+            "Settings",
+            True,
+            5,
+            self.font,
+            "assets/sfx/bump.ogg",
+            self.sfx_volume,
+            5,
+        )
 
     def update(self, *args):
         dt = args[0]
@@ -75,7 +79,9 @@ class MainMenuScene(BaseScene):
             self.sfx_volume = sfx_volume
 
         self.button_play.update(mouse_pos, mouse_pressed, stt.cursor, self.sfx_volume)
-        self.button_settings.update(mouse_pos, mouse_pressed, stt.cursor, self.sfx_volume)
+        self.button_settings.update(
+            mouse_pos, mouse_pressed, stt.cursor, self.sfx_volume
+        )
 
         if self.button_play.clicked:
             self.change_scene = True
@@ -106,42 +112,48 @@ class SettingsScene(BaseScene):
 
         self.display = display
 
-        self.slider_sfx = Slider(rect=pg.Rect(120, 120, 400, 20),
-                                 min_value=0,
-                                 max_value=1,
-                                 initial_value=1,
-                                 slide_sound_path="assets/sfx/bump.ogg",
-                                 sfx_volume=self.sfx_volume,
-                                 step=0.1)
+        self.slider_sfx = Slider(
+            rect=pg.Rect(120, 120, 400, 20),
+            min_value=0,
+            max_value=1,
+            initial_value=1,
+            slide_sound_path="assets/sfx/bump.ogg",
+            sfx_volume=self.sfx_volume,
+            step=0.1,
+        )
 
         self.font = font
         self.text_sfx = self.font.render("SFX", 5, True)
         self.text_sfx_pos = ((stt.D_W - self.text_sfx.get_width()) // 2, 70)
 
-        self.slider_music = Slider(rect=pg.Rect(120, 220, 400, 20),
-                                   min_value=0,
-                                   max_value=1,
-                                   initial_value=1,
-                                   slide_sound_path="assets/sfx/bump.ogg",
-                                   sfx_volume=self.sfx_volume,
-                                   step=0.1)
+        self.slider_music = Slider(
+            rect=pg.Rect(120, 220, 400, 20),
+            min_value=0,
+            max_value=1,
+            initial_value=1,
+            slide_sound_path="assets/sfx/bump.ogg",
+            sfx_volume=self.sfx_volume,
+            step=0.1,
+        )
 
         self.music_volume = 1
 
         self.text_music = self.font.render("music", 5, True)
         self.text_music_pos = ((stt.D_W - self.text_sfx.get_width()) // 2, 170)
 
-        self.button_exit = Button(pg.Rect(20, 20, 100, 50),
-                                  colors["cyan"],
-                                  colors["dark-cyan"],
-                                  colors["light-cyan"],
-                                  colors["cyan"],
-                                  "Back",
-                                  True,
-                                  5,
-                                  self.font,
-                                  "assets/sfx/bump.ogg",
-                                  self.sfx_volume)
+        self.button_exit = Button(
+            pg.Rect(20, 20, 100, 50),
+            colors["cyan"],
+            colors["dark-cyan"],
+            colors["light-cyan"],
+            colors["cyan"],
+            "Back",
+            True,
+            5,
+            self.font,
+            "assets/sfx/bump.ogg",
+            self.sfx_volume,
+        )
 
     def draw(self, *args):
         dt = args[0]
@@ -193,31 +205,35 @@ class DifficultySelectScene(BaseScene):
 
         self.selected_difficulty = 1
 
-        self.button_easy = Button(pg.Rect(70, 275, 500, 100),
-                                  colors["green"],
-                                  colors["dark-green"],
-                                  colors["light-green"],
-                                  colors["green"],
-                                  "Ez-easy",
-                                  True,
-                                  5,
-                                  self.font,
-                                  "assets/sfx/bump.ogg",
-                                  self.sfx_volume,
-                                  5)
+        self.button_easy = Button(
+            pg.Rect(70, 275, 500, 100),
+            colors["green"],
+            colors["dark-green"],
+            colors["light-green"],
+            colors["green"],
+            "Ez-easy",
+            True,
+            5,
+            self.font,
+            "assets/sfx/bump.ogg",
+            self.sfx_volume,
+            5,
+        )
 
-        self.button_hard = Button(pg.Rect(70, 400, 500, 105),
-                                  colors["tangerine"],
-                                  colors["brown"],
-                                  colors["orange"],
-                                  colors["tangerine"],
-                                  "HARDCODE-YEAH",
-                                  True,
-                                  5,
-                                  self.font,
-                                  "assets/sfx/bump.ogg",
-                                  self.sfx_volume,
-                                  5)
+        self.button_hard = Button(
+            pg.Rect(70, 400, 500, 105),
+            colors["tangerine"],
+            colors["brown"],
+            colors["orange"],
+            colors["tangerine"],
+            "HARDCODE-YEAH",
+            True,
+            5,
+            self.font,
+            "assets/sfx/bump.ogg",
+            self.sfx_volume,
+            5,
+        )
 
     def update(self, *args):
         dt = args[0]
@@ -283,14 +299,29 @@ class GameScene(BaseScene):
         player_collision_type = 1
         chaser_collision_type = 2
 
-        self.player = Player(self.map.checkpoints.current_checkpoint.center, player_collision_type)
+        self.player = Player(
+            self.map.checkpoints.current_checkpoint.center, player_collision_type
+        )
         self.camera = Camera(self.player.rect.body.position)
-        self.chaser = Chaser((self.player.rect.body.position.x,
-                              self.player.rect.body.position.y + 200),
-                             self.map.array, chaser_collision_type, self.difficulty)
+        self.chaser = Chaser(
+            (self.player.rect.body.position.x, self.player.rect.body.position.y + 200),
+            self.map.array,
+            chaser_collision_type,
+            self.difficulty,
+        )
 
-        self.player_collision_handlers = [stt.space.add_collision_handler(player_collision_type, obstacles_collision_type + i - 3) for i in range(len(self.map.objects) + 4)]
-        self.chaser_collision_handlers = [stt.space.add_collision_handler(chaser_collision_type, obstacles_collision_type + i - 3) for i in range(len(self.map.objects) + 4)]
+        self.player_collision_handlers = [
+            stt.space.add_collision_handler(
+                player_collision_type, obstacles_collision_type + i - 3
+            )
+            for i in range(len(self.map.objects) + 4)
+        ]
+        self.chaser_collision_handlers = [
+            stt.space.add_collision_handler(
+                chaser_collision_type, obstacles_collision_type + i - 3
+            )
+            for i in range(len(self.map.objects) + 4)
+        ]
 
         self.bounds = self.map.boundaries
 
@@ -353,11 +384,15 @@ class GameScene(BaseScene):
         player_collision_type = 1
         chaser_collision_type = 2
 
-        self.player = Player(self.map.checkpoints.current_checkpoint.center, player_collision_type)
+        self.player = Player(
+            self.map.checkpoints.current_checkpoint.center, player_collision_type
+        )
         self.camera = Camera(self.player.rect.body.position)
-        self.chaser = Chaser((self.player.rect.body.position.x,
-                              self.player.rect.body.position.y + 200),
-                             self.map.array, chaser_collision_type)
+        self.chaser = Chaser(
+            (self.player.rect.body.position.x, self.player.rect.body.position.y + 200),
+            self.map.array,
+            chaser_collision_type,
+        )
 
 
 class WinScene(BaseScene):
@@ -382,8 +417,8 @@ class WinScene(BaseScene):
     def draw(self, *args):
         self.display.fill("white")
 
-        self.display.blit(self.label, ((stt.D_W - self.label.get_width())//2, 200))
+        self.display.blit(self.label, ((stt.D_W - self.label.get_width()) // 2, 200))
 
-        self.display.blit(self.text, ((stt.D_W - self.text.get_width())//2, 500))
+        self.display.blit(self.text, ((stt.D_W - self.text.get_width()) // 2, 500))
         self.display.blit(self.text2, ((stt.D_W - self.text2.get_width()) // 2, 550))
         self.display.blit(self.text3, ((stt.D_W - self.text3.get_width()) // 2, 600))

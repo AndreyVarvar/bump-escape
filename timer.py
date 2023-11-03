@@ -23,8 +23,8 @@ class Timer:
         minutes = seconds // 60
         hours = minutes // 60  # HOW LONG HAVE YOU BEEN PLAYING?????
 
-        minutes -= hours*60
-        seconds -= minutes*60 + hours*3600
+        minutes -= hours * 60
+        seconds -= minutes * 60 + hours * 3600
 
         # get numbers image
         time_board = self.label.copy().convert_alpha()
@@ -45,9 +45,13 @@ class Timer:
 
         if len(str(n)) == 1:
             numbers.blit(self.numbers.subsurface(pg.Rect(0, 0, 8, 16)), (0, 0))
-            numbers.blit(self.numbers.subsurface(pg.Rect(n*8, 0, 8, 16)), (9, 0))
+            numbers.blit(self.numbers.subsurface(pg.Rect(n * 8, 0, 8, 16)), (9, 0))
         else:
-            numbers.blit(self.numbers.subsurface(pg.Rect(int(str(n)[0])*8, 0, 8, 16)), (0, 0))
-            numbers.blit(self.numbers.subsurface(pg.Rect(int(str(n)[1])*8, 0, 8, 16)), (9, 0))
+            numbers.blit(
+                self.numbers.subsurface(pg.Rect(int(str(n)[0]) * 8, 0, 8, 16)), (0, 0)
+            )
+            numbers.blit(
+                self.numbers.subsurface(pg.Rect(int(str(n)[1]) * 8, 0, 8, 16)), (9, 0)
+            )
 
         return numbers

@@ -10,7 +10,7 @@ class Player:
     def __init__(self, pos, collision_type):
         self.pos = pg.Vector2(pos)
 
-        self.image = pg.transform.scale_by(pg.image.load("assets/images/kart.png"), 3)
+        self.image = pg.transform.scale_by(pg.image.load("assets/images/kart.png"), 2.8)
         self.rotation = 90  # degrees
 
         self.movement = {"forward": False, "backward": False, "left-turn": False, "right-turn": False}
@@ -41,10 +41,10 @@ class Player:
 
         # change position based on movement
         if self.movement["forward"]:
-            self.rect.body.apply_force_at_local_point((0, -10**5))
+            self.rect.body.apply_force_at_local_point((0, -10**5*1.5))
 
         if self.movement["backward"]:
-            self.rect.body.apply_force_at_local_point((0, 10**5))
+            self.rect.body.apply_force_at_local_point((0, 10**5*1.5))
 
         # rotate or SPIN
         if gm.xor(self.movement["right-turn"], self.movement["left-turn"]):

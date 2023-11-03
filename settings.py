@@ -1,6 +1,7 @@
 import pygame as pg
 import pymunk as pm
 from debugger import Debugger
+from cursor import Cursor
 
 # pygame stuff
 pg.init()
@@ -17,6 +18,8 @@ space.gravity = 0, 0  # top down, no gravity
 
 cell_size = D_W/10
 
-channel_sfx = pg.mixer.Channel(0)
+channel_music = pg.mixer.Channel(0)
 
 debugger = Debugger()
+
+cursor = Cursor()

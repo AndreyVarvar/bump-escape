@@ -15,6 +15,8 @@ class Button:
                  outline_text: bool,
                  corner_radius: int,
                  font: Font,
+                 click_sound_path: str,
+                 sfx_volume: float,
                  text_scale=3):
 
         self.rect = rect
@@ -26,6 +28,10 @@ class Button:
 
         self.corner_radius = corner_radius
 
+        self.click_sound = pg.mixer.Sound(click_sound_path)
+        self.sfx_volume = sfx_volume
+        self.click_sound.set_volume(sfx_volume)
+
         self.font = font
         self.text = self.font.render(text, text_scale, outline_text)
         self.text_pos = (self.rect.x + (self.rect.width - self.text.get_width())/2,
@@ -34,12 +40,19 @@ class Button:
         self.hovered = False
         self.clicked = False
 
-    def update(self, mouse_pos, mouse_pressed):
+    def update(self, mouse_pos, mouse_pressed, cursor, sfx_volume=None):
+        if sfx_volume is not None:
+            if self.sfx_volume != sfx_volume:
+                self.sfx_volume = sfx_volume
+                self.click_sound.set_volume(sfx_volume)
+
         if self.rect.collidepoint(mouse_pos):
             self.hovered = True
 
-            if mouse_pressed[0]:
+            if mouse_pressed[0] and not cursor.busy:
+                self.click_sound.play()
                 self.clicked = True
+                cursor.busy = True
             else:
                 self.clicked = False
         else:

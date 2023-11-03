@@ -11,6 +11,9 @@ class Camera:
     def follow(self, pos):
         self.rect.bottom = pos[1]  # i don't understand myself why bottomright
 
+        if self.rect.bottom > 23250:
+            self.rect.bottom = 23250
+
     def draw(self, surf):
         surf.blit(self.frame, (0, 0))
 

@@ -1,12 +1,6 @@
 import settings as stt
 import pygame as pg
-from player import Player
-import pymunk as pm
-import pymunk.pygame_util as pg_util
-from camera import Camera
-from game_map import Map
-from chaser import Chaser
-from timer import Timer
+from scenes import GameScene, SettingsScene
 
 
 class Game:
@@ -19,34 +13,24 @@ class Game:
 
         self.running = True
 
-        self.draw_options = pg_util.DrawOptions(self.display)
+        self.scenes = {"main menu": "MainMenuScene",
+                       "settings": SettingsScene(self.display),
+                       "difficulty selection": "DifficultySelectScene",
+                       "game": GameScene(self.display),
+                       "win screen": "WinScene"}
 
-        # map
-        self.map = Map(1)
+        self.sfx_volume = 1
 
-        # timer
-        self.timer = Timer()
+        self.current_scene = self.scenes["settings"]
 
-        # main characters (not durk)
-        obstacles_collision_type = 7
-        player_collision_type = 1
-        chaser_collision_type = 2
-
-        self.player = Player(self.map.checkpoints.current_checkpoint.center, player_collision_type)
-        self.camera = Camera(self.player.rect.body.position)
-        self.chaser = Chaser((self.player.rect.body.position.x,
-                              self.player.rect.body.position.y + 200),
-                             self.map.array, chaser_collision_type)
-
-        self.player_collision_handlers = [stt.space.add_collision_handler(player_collision_type, obstacles_collision_type + i) for i in range(len(self.map.objects)+4)]
-        self.chaser_collision_handlers = [stt.space.add_collision_handler(chaser_collision_type, obstacles_collision_type + i) for i in range(len(self.map.objects)+4)]
-
-        self.bounds = self.map.boundaries
+        self.music_menu = pg.mixer.Sound("assets/music/main-menu.wav")
+        self.music_in_game = pg.mixer.Sound("assets/music/in-game.wav")
+        self.music_HARDMODE_YEAAAH = pg.mixer.Sound("assets/music/hardmode.wav")
 
     def run(self):
         while self.running:
             # update some variables
-            dt = self.clock.tick(self.FPS)/1000
+            dt = self.clock.tick(self.FPS) / 1000
 
             keys_pressed = pg.key.get_pressed()
             mouse_pressed = pg.mouse.get_pressed()
@@ -55,47 +39,29 @@ class Game:
             events = pg.event.get()
 
             # process what just happened
-            self.handle_events(dt, events, keys_pressed, mouse_pressed, mouse_pos)
-            self.update(dt)
+            self.update(dt, mouse_pos, mouse_pressed)
             self.draw(dt)
+            self.handle_events(dt, events, keys_pressed, mouse_pressed, mouse_pos)
 
-    def update(self, dt):
-        self.player.update(dt)
-        self.chaser.update(dt, self.player.rect.body.position)
-        stt.space.step(1/self.FPS)
+    def update(self, dt, mouse_pos, mouse_pressed):
+        self.current_scene.update(dt, mouse_pos, mouse_pressed, False)
 
-        self.camera.follow(self.player.rect.body.position)
+        if self.current_scene.name == "settings":
+            self.sfx_volume = self.current_scene.slider_sfx.value
 
-        self.timer.update(dt)
+            for scene in self.scenes.values():
+                if isinstance(scene, str) is False:
+                    scene.sfx_volume = self.sfx_volume
 
-        for handler in self.player_collision_handlers:
-            handler.begin = self.player.play_sound
-
-        for handler in self.chaser_collision_handlers:
-            handler.begin = self.chaser.play_sound
-
-        stt.debugger.update("fps", str(round(1/dt)))
+        if self.current_scene.change_scene:
+            prev_scene = self.current_scene
+            self.current_scene = self.scenes[self.current_scene.new_scene]
+            prev_scene.reset()
 
     def draw(self, dt):
         self.display.fill("white")
-        self.camera.clear()
 
-        self.map.draw(self.camera)
-
-        # temp = pg.Surface((stt.cell_size, stt.cell_size), pg.SRCALPHA)
-        # temp.fill((0, 255, 127))
-        # for cell in self.chaser.path:
-        #     cell = list(cell)
-        #     self.camera.blit(temp, (cell[1]*stt.cell_size, cell[0]*stt.cell_size))
-
-        self.player.draw(dt, self.camera)
-        self.chaser.draw(dt, self.camera)
-
-        self.camera.draw(self.display)
-
-        self.timer.draw(self.display)
-
-        # stt.debugger.draw(self.display)
+        self.current_scene.draw(dt, self.display)
 
         pg.display.update()
 
@@ -104,7 +70,7 @@ class Game:
             if event.type == pg.QUIT:
                 self.running = False
 
-        self.player.handle_events(events, keys_pressed)
+        self.current_scene.handle_events(dt, events, keys_pressed, mouse_pressed, mouse_pos)
 
 
 i_am_tired_of_writing_long_name_on_these_variables_for_fun = Game()

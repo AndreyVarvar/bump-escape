@@ -45,7 +45,7 @@ class Map:
         checkpoints = Checkpoints()
         map_array = []
 
-        bounds_rect = pg.FRect(0, 0, stt.D_W,map_layout_image_size[1] * stt.cell_size - 20)
+        bounds_rect = pg.FRect(0, 0, stt.D_W, map_layout_image_size[1] * stt.cell_size - 20)
 
         bounds = Box(bounds_rect)
 

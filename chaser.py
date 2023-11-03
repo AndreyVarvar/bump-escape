@@ -1,9 +1,7 @@
 import settings as stt
 import pygame as pg
-from shape import Circle
 import pymunk as pm
-import game_math as gm
-from math import cos, sin, degrees as deg, radians as rad, pi, dist
+from math import cos, sin, degrees as deg, pi, dist
 
 from pathfinding.core.grid import Grid
 from pathfinding.finder.dijkstra import DijkstraFinder
@@ -43,6 +41,8 @@ class Chaser:
 
         self.path = []
 
+        self.sfx_volume = 1
+
     def find_path(self, player_pos):
         player_pos_in_matrix = (int(player_pos[1] // stt.cell_size),
                                 int(player_pos[0] // stt.cell_size))
@@ -68,8 +68,9 @@ class Chaser:
             stt.debugger.update("path", "not calculating")
             return self.path
 
-    def update(self, dt, player_pos):
+    def update(self, dt, player_pos, sfx_volume):
         self.path = self.find_path(player_pos)
+        self.sfx_volume = sfx_volume
 
         next_cell_pos = list(self.path[1 if len(self.path) >= 2 else 0])
         next_cell = pg.Rect(next_cell_pos[1] * stt.cell_size, next_cell_pos[0] * stt.cell_size, stt.cell_size, stt.cell_size)
@@ -142,5 +143,11 @@ class Chaser:
             return path
 
     def play_sound(self, arbiter, space, data):
+        player_pos = self.prev_player_pos[0]*stt.cell_size, self.prev_player_pos[1]*stt.cell_size
+        volume = -dist(player_pos, self.circ.body.position)/(5*stt.cell_size) + 1
+
+        if volume < 0:
+            volume = 0
+        self.collision_sound.set_volume(volume*self.sfx_volume)
         self.collision_sound.play()
         return True

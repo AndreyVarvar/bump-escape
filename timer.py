@@ -51,4 +51,3 @@ class Timer:
             numbers.blit(self.numbers.subsurface(pg.Rect(int(str(n)[1])*8, 0, 8, 16)), (9, 0))
 
         return numbers
-

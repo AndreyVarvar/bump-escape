@@ -1,6 +1,6 @@
 import settings as stt
 import pygame as pg
-from math import radians as rad, sin, cos, sqrt, degrees as deg, pi
+from math import sin, cos, degrees as deg, pi
 import pymunk as pm
 from shape import Rectangle
 import game_math as gm
@@ -30,16 +30,16 @@ class Player:
 
         self.current_image = self.get_image()
 
+        self.sfx_volume = 1
+
     def update(self, *args):
         dt = args[0]
+        self.sfx_volume = args[1]
 
         # update the image
         self.current_image = self.get_image()
 
         # change position based on movement
-        velocity_vector = pg.Vector2(self.rect.body.velocity)
-        looking = pg.Vector2(sin(self.rect.body.angle), cos(self.rect.body.angle))
-
         if self.movement["forward"]:
             self.rect.body.apply_force_at_local_point((0, -10**5))
 
@@ -93,5 +93,6 @@ class Player:
         return image
 
     def play_sound(self, arbiter, space, data):
+        self.collision_sound.set_volume((1 - (1/((self.rect.body.kinetic_energy/(5*10**7))+1)))*self.sfx_volume)
         self.collision_sound.play()
         return True

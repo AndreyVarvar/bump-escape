@@ -10,6 +10,12 @@ from scenes import (
 from font import Font
 from consts import colors
 
+import pymunk
+import pathfinding
+
+import asyncio
+import _cffi_backend  # this is needed for the webbuild
+
 
 class Game:
     def __init__(self):
@@ -49,7 +55,7 @@ class Game:
 
         self.road = pg.transform.scale_by(pg.image.load("assets/images/road.png"), 4)
 
-    def run(self):
+    async def run(self):
         while self.running:
             # update some variables
             dt = self.clock.tick(self.FPS) / 1000
@@ -64,6 +70,8 @@ class Game:
             self.update(dt, mouse_pos, mouse_pressed)
             self.draw(dt)
             self.handle_events(dt, events, keys_pressed, mouse_pressed, mouse_pos)
+
+            await asyncio.sleep(0)
 
     def update(self, dt, mouse_pos, mouse_pressed):
         self.current_scene.update(dt, mouse_pos, mouse_pressed, self.sfx_volume)
@@ -136,4 +144,4 @@ class Game:
 
 
 i_am_tired_of_writing_long_name_on_these_variables_for_fun = Game()
-i_am_tired_of_writing_long_name_on_these_variables_for_fun.run()
+asyncio.run(i_am_tired_of_writing_long_name_on_these_variables_for_fun.run())
